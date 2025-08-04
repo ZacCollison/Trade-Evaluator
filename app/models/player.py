@@ -1,14 +1,13 @@
-from pydantic import basemodel
+from pydantic import BaseModel
+from typing import Optional
 
-class Player(basemodel):
-    id : str
-    name : str
+class Player(BaseModel):
+    id : int
+    name : Optional[str]
     team : str
     games_played : float
     ppg : float
     rpg : float
     apg : float
-    position : list[str]
     fppg : float
     games_remaining : int
-    injury_status : str

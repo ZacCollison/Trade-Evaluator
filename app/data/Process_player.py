@@ -1,5 +1,6 @@
-from NBA_api_fetch import fetch_player_stats
+from .NBA_api_fetch import fetch_player_stats
 from ..models.player import Player
+import pandas as pd
 
 def calculate_fantasy_value(row) -> float:
     val = (
@@ -24,24 +25,25 @@ def get_all_players():
     df = fetch_player_stats()
     players = []
 
+    # Convert PLAYER_NAME to string, then replace pd.NA with None
+    df["PLAYER_NAME"] = df["PLAYER_NAME"].apply(
+        lambda x: None if pd.isna(x) else x
+    )
+
     for _, row in df.iterrows():
         fantasy_value = calculate_fantasy_value(row)
 
         player = Player(
-            id=row['PLAYER_ID'],
-            name=row['PLAYER_NAME'],
+            id=int(row['PLAYER_ID']),
+            name=row['PLAYER_NAME'],       # now guaranteed str or None
             team=row['TEAM_ABBREVIATION'],
-            games_played=row['GP'],
-            ppg=row['PTS'],
-            rpg=row['REB'],
-            apg=row['AST'],
-            position=row['PlayerPosition'],
-            fppg=fantasy_value,
-            games_remaining=82-row['GP'],
-            injury_status=None
-
+            games_played=int(row['GP']),
+            ppg=float(row['PTS']),
+            rpg=float(row['REB']),
+            apg=float(row['AST']),
+            fppg=float(fantasy_value),
+            games_remaining=82 - int(row['GP']),
         )
-
         players.append(player)
 
     return players
