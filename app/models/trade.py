@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from player import Player
+from .player import Player
 
 class trade(BaseModel):
     teamA : str

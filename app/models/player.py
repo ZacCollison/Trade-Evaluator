@@ -11,3 +11,4 @@ class Player(BaseModel):
     apg : float
     fppg : float
     games_remaining : int
+    injured : bool

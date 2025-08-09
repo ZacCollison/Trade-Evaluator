@@ -1,5 +1,6 @@
 from .NBA_api_fetch import fetch_player_stats
 from ..models.player import Player
+from .injuries import scrape_injuries
 import pandas as pd
 
 def calculate_fantasy_value(row) -> float:
@@ -23,7 +24,9 @@ def calculate_fantasy_value(row) -> float:
 
 def get_all_players():
     df = fetch_player_stats()
-    players = []
+    players = {}
+
+    injured_players = scrape_injuries()
 
     # Convert PLAYER_NAME to string, then replace pd.NA with None
     df["PLAYER_NAME"] = df["PLAYER_NAME"].apply(
@@ -32,6 +35,7 @@ def get_all_players():
 
     for _, row in df.iterrows():
         fantasy_value = calculate_fantasy_value(row)
+        
 
         player = Player(
             id=int(row['PLAYER_ID']),
@@ -43,7 +47,9 @@ def get_all_players():
             apg=float(row['AST']),
             fppg=float(fantasy_value),
             games_remaining=82 - int(row['GP']),
+            injured = (row['PLAYER_NAME'] in injured_players)
         )
-        players.append(player)
+        players[row['PLAYER_NAME']] = player
+        # players.append(player)
 
     return players
